@@ -1,21 +1,26 @@
-API_key = "44f97a9319af01c8ed8107fc731c7aac";
+const API_key = "44f97a9319af01c8ed8107fc731c7aac";
 
 (function() {
 
 	function Slackr() {
-		this.album = document.getElementById("slackr"),
-		this.slideshow = document.getElementById("slideshow"),
-		this.currentSlideImg = document.getElementById("slide-img"),
-		this.currentSlideTitle = document.getElementById("slide-title"),
-		this.currentSlideIndex,
-		this.photosArr = [], // Array of photo ids to keep order
-		this.photosMap = {} // Map of photo ids to photo objs
-
-		this.init();
+		this.initProps();
+		this.loadPhotos();
+		this.addEventListeners();
 	}
 
 	Slackr.prototype = {
-		init: function(searchTerm) {
+		initProps: function() {
+			this.spinner = document.getElementById("spinner"),
+			this.album = document.getElementById("album"),
+			this.slideshow = document.getElementById("slideshow"),
+			this.currentSlide = document.getElementById("slide"),
+			this.currentSlideImg = document.getElementById("slide-img"),
+			this.currentSlideTitle = document.getElementById("slide-title"),
+			this.currentSlideIndex,
+			this.photosArr = [], // Array of photo ids to keep order
+			this.photosMap = {} // Map of photo ids to photo objs
+		},
+		loadPhotos: function(searchTerm) {
 			var self = this,
 				url = this.buildApilUrl(searchTerm);
 
@@ -28,17 +33,47 @@ API_key = "44f97a9319af01c8ed8107fc731c7aac";
 					throw error;
 				});
 		},
+		addEventListeners: function() {
+			this.album.addEventListener("click", function(event) {
+				var photoId = event.srcElement.getAttribute("data-id");
+				if (photoId) this.openModal(photoId);
+			}.bind(this));
+
+			this.slideshow.addEventListener("click", function(event) {
+				var classList = event.target.classList;
+
+				if (classList.contains("next-button")) {
+					this.nextSlide();
+				} else if (classList.contains("prev-button")) {
+					this.prevSlide();
+				} else if (classList.contains("slide-img") || classList.contains("slide-title")) {
+					return;
+				} else {
+					this.closeModal();
+				}
+			}.bind(this));
+
+			document.onkeydown = function(event) {
+				switch (event.keyCode) {
+					case 37:
+						if (this.currentSlideIndex != undefined) this.prevSlide();
+						break;
+					case 39:
+						if (this.currentSlideIndex != undefined) this.nextSlide();
+						break;
+					case 27:
+						if (this.currentSlideIndex != undefined) this.closeModal();
+						break;
+				}
+			}.bind(this);
+		},
 		getJSON: function(url) {
 			return new Promise(function(resolve, reject) {
 				var request = new XMLHttpRequest();
 				request.open("GET", url);
 
 				request.onload = function() {
-					if (request.status == 200) {
-						resolve(request.response);
-					} else {
-						reject(Error(request.statusText));
-					}
+					request.status == 200 ? resolve(request.response) : reject(Error(request.statusText));
 				}
 
 				request.onerror = function() { reject(Error("Network Error")); }
@@ -54,10 +89,14 @@ API_key = "44f97a9319af01c8ed8107fc731c7aac";
 				var polaroid = this.buildPolaroid(photoObj);
 				this.album.appendChild(polaroid);
 			};
+			setTimeout(function(){
+				this.spinner.style.display = "none";
+				this.album.style.display = "block";
+			}, 2000);
 		},
 		buildApilUrl: function(searchTerm) {
 			searchTerm = searchTerm || "puppies";
-			return `https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${API_key}&tags=${searchTerm}&per_page=10&format=json&nojsoncallback=?`;
+			return `https://api.flickr.com/services/rest/?method=flickr.photos.search&api_key=${API_key}&tags=${searchTerm}&per_page=50&format=json&nojsoncallback=?`;
 		},
 		buildPolaroid: function(photo) {
 			var div = document.createElement("div");
@@ -70,7 +109,7 @@ API_key = "44f97a9319af01c8ed8107fc731c7aac";
 			img.dataset.id = photo.id;
 
 			var paragraph = document.createElement("p");
-			paragraph.innerText = photo.title;
+			paragraph.dataset.title = photo.title;
 
 			div.appendChild(img);
 			div.appendChild(paragraph);
@@ -81,72 +120,45 @@ API_key = "44f97a9319af01c8ed8107fc731c7aac";
 			this.currentSlideImg.src = currentPhoto.buildSlideImageUrl();
 			this.currentSlideTitle.innerText = currentPhoto.title;
 			this.currentSlideIndex = this.photosArr.indexOf(photoId);
-			this.slideshow.style.display = "block";
+			setTimeout(function() { this.slideshow.style.display = "block"; }, 250);
 		},
 		closeModal: function() {
+			this.currentSlideIndex = undefined;
 			this.currentSlideImg.src = "";
 			this.currentSlideTitle.innerText = "";
 			this.slideshow.style.display = "none";
 		},
 		nextSlide: function() {
+			this.hideSlide();
 			this.currentSlideIndex++;
-			if (this.currentSlideIndex == this.photosArr.length) this.currentSlideIndex = 0;
+			if (this.currentSlideIndex == this.photosArr.length) { this.currentSlideIndex = 0; }
 
 			var nextPhoto = this.photosMap[this.photosArr[this.currentSlideIndex]];
-			this.currentSlideImg.src = nextPhoto.buildSlideImageUrl();
-			this.currentSlideTitle.innerText = nextPhoto.title;
+			this.showSlide(nextPhoto);
 		},
 		prevSlide: function() {
+			this.hideSlide();
 			this.currentSlideIndex--;
-			if (this.currentSlideIndex == -1) this.currentSlideIndex = this.photosArr.length - 1;
+			if (this.currentSlideIndex == -1) { this.currentSlideIndex = this.photosArr.length - 1; }
 
 			var prevPhoto = this.photosMap[this.photosArr[this.currentSlideIndex]];
-			this.currentSlideImg.src = prevPhoto.buildSlideImageUrl();
-			this.currentSlideTitle.innerText = prevPhoto.title;
+			this.showSlide(prevPhoto);
+		},
+		hideSlide: function() {
+			this.currentSlide.style.display = "none";
+			this.spinner.style.display = "block";
+		},
+		showSlide: function(photo) {
+			this.currentSlideImg.src = photo.buildSlideImageUrl();
+			this.currentSlideTitle.innerText = photo.title;
+			setTimeout(function() {
+				this.currentSlide.style.display = "block";
+				this.spinner.style.display = "none";
+			}.bind(this), 750);
 		}
 	};
 
-	function Photo(photo) {
-		this.id = photo.id;
-		this.farm = photo.farm;
-		this.server = photo.server;
-		this.secret = photo.secret;
-		this.title = photo.title;
-	}
-
-	Photo.prototype = {
-		buildAlbumImageUrl: function() {
-			return `https://farm${this.farm}.staticflickr.com/${this.server}/${this.id}_${this.secret}_q.jpg`;
-		},
-		buildSlideImageUrl: function() {
-			return `https://farm${this.farm}.staticflickr.com/${this.server}/${this.id}_${this.secret}_b.jpg`;
-		}
-	}
-
 	document.addEventListener("DOMContentLoaded", function() {
 		var slackr = new Slackr();
-
-		slackr.album.addEventListener("click", function() {
-			var photoId = event.srcElement.getAttribute("data-id");
-
-			if (photoId) {
-				slackr.openModal(photoId);
-			}
-		});
-
-		slackr.slideshow.addEventListener("click", function() {
-			var classList = event.target.classList;
-
-			if (classList.contains("next-button")) {
-				slackr.nextSlide();
-			} else if (classList.contains("prev-button")) {
-				slackr.prevSlide();
-			} else if (classList.contains("slide-img") || classList.contains("slide-title")) {
-				return;
-			} else {
-				slackr.closeModal();
-			}
-		})
 	});
-
 })();

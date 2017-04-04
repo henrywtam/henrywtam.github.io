@@ -1,12 +1,19 @@
 html {
-	background-image: url(http://zurb.com/playground/uploads/upload/upload/87/wood-bg.jpg); 
-	background-repeat: repeat;
+	background-color: #A9A9A9;
+}
+
+body {
+	padding: 0 30px;
 }
 
 .puppy-wall-title {
 	text-align: center;
-	font-size: 50px;
+	font-size: 60px;
 	font-family: cursive;
+}
+
+#album {
+	display: none;
 }
 
 .polaroid {
@@ -16,12 +23,9 @@ html {
 }
  
 div.polaroid.hovering {
-	transform: scale(1.025);
-	-webkit-transform: scale(1.025);
-	-moz-transform: scale(1.025);
-	box-shadow: 0 10px 20px rgba(0,0,0,.7);
-	-webkit-box-shadow: 0 10px 20px rgba(0, 0, 0, .7);
-	-moz-box-shadow: 0 10px 20px rgba(0,0,0,.7);
+	box-shadow: 0 10px 20px rgba(0,0,0,.5);
+	-webkit-box-shadow: 0 10px 20px rgba(0, 0, 0, .5);
+	-moz-box-shadow: 0 10px 20px rgba(0,0,0,.5);
 }
 
 .polaroid img {
@@ -37,7 +41,7 @@ div.polaroid.hovering {
 	font-family: fantasy;
 	position: absolute;
 	text-align: center;
-	width: 90%;
+	width: 100%;
 	padding: 0 8px;
 	bottom: 0px;
 	white-space: nowrap;
@@ -45,77 +49,121 @@ div.polaroid.hovering {
 	text-overflow: ellipsis;
 }
 
+.polaroid p:before {
+	content: attr(data-title);
+}
+
+div.polaroid:first-child {
+	-webkit-transform: rotate(-6deg);
+	-moz-transform: rotate(-6deg); 
+	transform: rotate(-6deg); 
+}
+
+div.polaroid:nth-child(2n) {
+	-webkit-transform: rotate(4deg);
+	-moz-transform: rotate(4deg); 
+	transform: rotate(4deg); 
+}
+
+div.polaroid:nth-child(3n) { 
+	-webkit-transform: rotate(-10deg);
+	-moz-transform: rotate(-10deg); 
+	transform: rotate(-10deg); 
+}
+
+div.polaroid:nth-child(4n) {
+	-webkit-transform: rotate(8deg);
+	-moz-transform: rotate(8deg); 
+	transform: rotate(8deg); 
+}
+
+div.polaroid:nth-child(5n) {
+	-webkit-transform: rotate(-6deg);
+	-moz-transform: rotate(-6deg); 
+	transform: rotate(-6deg); 
+}
+
 .modal {
-  display: none;
-  position: fixed;
-  z-index: 1;
-  padding-top: 60px;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: black;
+	display: none;
+	position: fixed;
+	z-index: 1;
+	padding-top: 60px;
+	left: 0;
+	top: 0;
+	width: 100%;
+	height: 100%;
+	overflow: auto;
+	background-color: black;
 }
 
 #slide-img {
 	width: 80%;
-	max-width: 800px;
+	max-height: 450px;
+	max-width: 600px;
 	display: block;
-  margin: 0 auto;
+	margin: 0 auto;
 }
 
 #slide-title {
+	max-width: 750px;
+	width: 70%;
 	padding: 0 40px;
+	margin: 0 auto;
 	font-size: 50px;
 	text-align: center;
 	padding-bottom: 20px;
 	font-family: fantasy;
-  color: white;
-  white-space: nowrap;
+	color: white;
+	white-space: nowrap;
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
 
 .close {
-  color: white;
-  position: absolute;
-  top: 10px;
-  right: 25px;
-  font-size: 35px;
-  font-weight: bold;
+	color: white;
+	position: absolute;
+	top: 16px;
+	right: 40px;
+	font-size: 50px;
+	font-weight: bold;
 }
 
 .close:hover,
 .close:focus {
-  color: #999;
-  text-decoration: none;
-  cursor: pointer;
+	color: #999;
+	text-decoration: none;
+	cursor: pointer;
 }
 
 .prev-button,
 .next-button {
-  cursor: pointer;
-  position: absolute;
-  top: 50%;
-  width: auto;
-  padding: 16px;
-  margin-top: -50px;
-  color: white;
-  font-weight: bold;
-  font-size: 20px;
-  transition: 0.6s ease;
-  border-radius: 0 3px 3px 0;
-  user-select: none;
-  -webkit-user-select: none;
+	cursor: pointer;
+	position: absolute;
+	top: 50%;
+	width: auto;
+	padding: 30px;
+	margin-top: -70px;
+	color: white;
+	font-weight: bold;
+	font-size: 50px;
+	transition: 0.6s ease;
+	border-radius: 0 3px 3px 0;
+	user-select: none;
+	-webkit-user-select: none;
+}
+
+.prev-button {
+	left: 10%;
 }
 
 .next-button {
-  right: 0;
-  border-radius: 3px 0 0 3px;
+	right: 10%;
+	border-radius: 3px 0 0 3px;
 }
 
 .prev-button:hover,
 .next-button:hover {
-  background-color: rgba(0, 0, 0, 0.8);
+	color: #999;
+	text-decoration: none;
+	cursor: pointer;
 }

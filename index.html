@@ -1,29 +1,32 @@
 <!doctype html>
 <html>
-		<head>
-				<meta charset="utf-8">
-				<meta http-equiv="x-ua-compatible" content="ie=edge">
-				<title></title>
-				<meta name="description" content="">
-				<meta name="viewport" content="width=device-width, initial-scale=1">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="x-ua-compatible" content="ie=edge">
+		<title></title>
+		<meta name="description" content="">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
 
-				<link rel="stylesheet" href="styles/slackr.css">
-		</head>
-		<body>
-			<h1 class="puppy-wall-title">Puppy Wall</h1>
-			<div id="slackr"></div>
-			<div id="slideshow" class="modal">
-				<span class="close cursor">&times;</span>
-				<div class="modal-content">
-					<div class="slide">
-						<div id="slide-title" class="slide-title"></div>
-						<img id="slide-img" class="slide-img"/>
-					</div>
-					<a class="prev-button">&#10094;</a>
-					<a class="next-button">&#10095;</a>
+		<link rel="stylesheet" href="styles/slackr.css">
+		<link rel="stylesheet" href="styles/spinner.css">
+	</head>
+	<body>
+		<div id="spinner" class="spinner"><div class="dot1"></div><div class="dot2"></div></div>
+		<h1 class="puppy-wall-title">Puppy Wall</h1>
+		<div id="album"></div>
+		<div id="slideshow" class="modal">
+			<span class="close cursor">&times;</span>
+			<div class="modal-content">
+				<div id="slide" class="slide">
+					<div id="slide-title" class="slide-title"></div>
+					<img id="slide-img" class="slide-img"/>
 				</div>
+				<a class="prev-button">&#10094;</a>
+				<a class="next-button">&#10095;</a>
 			</div>
-		</body>
+		</div>
+		
 		<script src="js/Slackr.js"></script>
 		<script src="js/Photo.js"></script>
+	</body>
 </html>
